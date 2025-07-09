@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fundamentals of Graphic Design & AI Integration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 210mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* A4 Page Styling - Optimized for PDF export */
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 10mm 15mm; /* Reduced margins */
+            background: white;
+            page-break-after: always;
+            position: relative;
+            overflow: hidden; /* Prevent content overflow */
+        }
+
+        .page:last-child {
+            page-break-after: avoid;
+        }
+
+        /* Mobile responsive version */
+        @media screen and (max-width: 768px) {
+            .container {
+                max-width: 100%;
+                box-shadow: none;
+            }
+            
+            .page {
+                width: 100%;
+                min-height: auto;
+                padding: 15px;
+                page-break-after: auto;
+                margin-bottom: 20px;
+            }
+            
+            .title-page {
+                height: 100vh;
+            }
+            
+            .two-column {
+                grid-template-columns: 1fr;
+                gap: 1em;
+            }
+            
+            .color-palette {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            table {
+                font-size: 0.8em;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+
+        /* Print Styles - Optimized for A4 */
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+                max-width: none;
+            }
+            .page {
+                margin: 0;
+                box-shadow: none;
+                padding: 10mm 15mm;
+                min-height: 297mm;
+            }
+
+            /* Force gradient rendering in print */
+            @media print {
+                body, .title-page, .card:last-child {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                }
+                
+                /* Ensure background colors/gradients print */
+                * {
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                    color-adjust: exact !important;
+                }
+                
+                /* Specific gradient preservation */
+                .title-page {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                }
+                
+                .highlight {
+                    background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%) !important;
+                }
+                
+                .card[style*="gradient"] {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+                }
+            }
+            
+            /* Prevent orphans and widows */
+            h2, h3, p {
+                page-break-inside: avoid;
+                page-break-after: avoid;
+            }
+            
+            ul, ol, table {
+                page-break-inside: avoid;
+            }
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.2em;
+            color: #2c3e50;
+            margin-bottom: 0.5em;
+            text-align: center;
+            font-weight: 300;
+        }
+
+        h2 {
+            font-size: 1.8em;
+            color: #34495e;
+            margin: 1em 0 0.8em 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 0.3em;
+        }
+
+        h3 {
+            font-size: 1.3em;
+            color: #2980b9;
+            margin: 1em 0 0.6em 0;
+        }
+
+        p {
+            margin-bottom: 0.8em;
+            text-align: justify;
+            font-size: 1em;
+            line-height: 1.5;
+        }
+
+        /* Card Styling - More compact */
+        .card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1em;
+            margin: 1em 0;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 0.8em;
+        }
+
+        /* Lists - More compact */
+        ul, ol {
+            margin: 0.8em 0 0.8em 1.5em;
+        }
+
+        li {
+            margin-bottom: 0.4em;
+            font-size: 1em;
+        }
+
+        /* Table Styling - More compact */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1em 0;
+            font-size: 0.9em;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        /* Special Elements */
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 0.8em;
+            border-radius: 6px;
+            margin: 0.8em 0;
+            border-left: 3px solid #e74c3c;
+            font-size: 0.95em;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5em;
+            margin: 1em 0;
+        }
+
+        .color-palette {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8em;
+            margin: 1em 0;
+        }
+
+        .color-item {
+            text-align: center;
+            padding: 0.8em;
+            border-radius: 6px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .red { background-color: #e74c3c; }
+        .orange { background-color: #f39c12; }
+        .yellow { background-color: #f1c40f; color: #333; }
+        .green { background-color: #27ae60; }
+        .blue { background-color: #3498db; }
+        .purple { background-color: #9b59b6; }
+
+        /* Page Numbers */
+        .page-number {
+            position: absolute;
+            bottom: 10mm;
+            right: 15mm;
+            font-size: 0.8em;
+            color: #7f8c8d;
+        }
+
+        /* Title Page Special Styling */
+        .title-page {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20mm;
+        }
+
+        .title-page h1 {
+            font-size: 2.8em;
+            margin-bottom: 0.5em;
+            color: white;
+        }
+
+        .title-page .subtitle {
+            font-size: 1.5em;
+            margin-bottom: 1.5em;
+            opacity: 0.9;
+        }
+
+        .title-page .author {
+            font-size: 1.1em;
+            margin-top: 1.5em;
+            opacity: 0.8;
+        }
+        
+        /* Print button styling */
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+        }
+        
+        @media print {
+            .print-button {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Title Page -->
+        <div class="page title-page">
+            <h1>Fundamentals of Graphic Design & AI Integration</h1>
+            <div class="subtitle">Advanced Module</div>
+            <img src="https://images.unsplash.com/photo-1561070791-2526d30994b5?w=500&h=300&fit=crop" alt="Abstract design concept" style="width: 80%; max-width: 400px; height: auto; aspect-ratio: 16/10; object-fit: cover; border-radius: 15px; margin: 1em auto;">
+            <div class="author">GreyBridge Virtual Hub</div>
+            <div class="page-number">1</div>
+        </div>
+
+        <!-- Page 2: Introduction to Graphic Design -->
+        <div class="page">
+            <h2>What is Graphic Design?</h2>
+            
+            <div class="card">
+                <img src="https://en.idei.club/uploads/posts/2023-03/1679135901_en-idei-club-p-graphic-design-workspace-dizain-krasivo-6.jpg?w=800&h=400&fit=crop" alt="Graphic design workspace" class="card-image">
+                
+                <p>Graphic design is the art and practice of planning and projecting ideas and experiences through visual and textual content. It encompasses a wide range of creative disciplines including drawing, painting, typography, and digital creation.</p>
+                
+                <p>At its core, graphic design serves as a bridge between ideas and their visual representation. It combines creativity with strategic thinking to communicate messages effectively, influence behaviors, and create memorable experiences.</p>
+                
+                <div class="highlight">
+                    <strong>Key Aspects of Graphic Design:</strong>
+                    <ul>
+                        <li>Visual communication and storytelling</li>
+                        <li>Problem-solving through design</li>
+                        <li>Brand identity and recognition</li>
+                        <li>User experience and interface design</li>
+                        <li>Print and digital media creation</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="page-number">2</div>
+        </div>
+
+        <!-- Page 3: Computer Graphics Types -->
+        <div class="page">
+            <h2>Computer Graphics: Raster vs Vector</h2>
+            
+            <div class="two-column">
+                <div class="card">
+                    <h3>Raster Graphics</h3>
+                    <img src="https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=200&fit=crop" alt="Pixel grid representation" class="card-image">
+                    <p><strong>Pixel-based images</strong> composed of tiny colored squares arranged in a grid pattern.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>Vector Graphics</h3>
+                    <img src="https://images.unsplash.com/photo-1558655146-d09347e92766?w=400&h=200&fit=crop" alt="Vector illustration" class="card-image">
+                    <p><strong>Path-based images</strong> created using mathematical formulas and geometric shapes.</p>
+                </div>
+            </div>
+            
+            <div class="highlight">
+                <h3>Guiding Questions:</h3>
+                <ul>
+                    <li>What defines raster versus vector images?</li>
+                    <li>How do their characteristics differ?</li>
+                    <li>When should you use each type?</li>
+                    <li>What are the advantages and limitations of each?</li>
+                </ul>
+            </div>
+            
+            <div class="page-number">3</div>
+        </div>
+
+        <!-- Page 4: Raster Images Deep Dive -->
+        <div class="page">
+            <h2>Raster Images: Pixel Perfection</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=800&h=300&fit=crop" alt="Digital photography and pixels" class="card-image">
+                
+                <h3>Characteristics of Raster Images</h3>
+                <ul>
+                    <li><strong>Pixel Composition:</strong> Made up of individual colored pixels arranged in a grid</li>
+                    <li><strong>Pointillist Nature:</strong> Similar to pointillist paintings where individual dots create the whole image</li>
+                    <li><strong>Resolution Dependent:</strong> Quality is determined by pixel density (DPI/PPI)</li>
+                    <li><strong>Scaling Limitations:</strong> Enlarging causes pixelation and quality loss</li>
+                </ul>
+                
+                <h3>Common File Formats</h3>
+                <ul>
+                    <li><strong>JPEG (.jpg):</strong> Best for photographs with many colors</li>
+                    <li><strong>PNG (.png):</strong> Supports transparency, ideal for web graphics</li>
+                    <li><strong>GIF (.gif):</strong> Limited colors, supports animation</li>
+                    <li><strong>TIFF (.tiff):</strong> High quality, used in professional printing</li>
+                </ul>
+                
+                <div class="highlight">
+                    <strong>Best Used For:</strong> Photo editing, digital painting, detailed artwork, web images, and any project requiring photographic realism.
+                </div>
+            </div>
+            
+            <div class="page-number">4</div>
+        </div>
+
+        <!-- Page 5: Vector Images Deep Dive -->
+        <div class="page">
+            <h2>Vector Graphics: Mathematical Precision</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=800&h=300&fit=crop" alt="Vector logo design" class="card-image">
+                
+                <h3>Characteristics of Vector Images</h3>
+                <ul>
+                    <li><strong>Mathematical Foundation:</strong> Created using mathematical path formulas and geometric shapes</li>
+                    <li><strong>Infinite Scalability:</strong> Can be resized to any dimension without quality loss</li>
+                    <li><strong>Smaller File Sizes:</strong> Efficient storage due to mathematical representation</li>
+                    <li><strong>Crisp Edges:</strong> Always maintain sharp, clean lines regardless of size</li>
+                </ul>
+                
+                <h3>Common File Formats</h3>
+                <ul>
+                    <li><strong>SVG (.svg):</strong> Web-friendly, scalable vector graphics</li>
+                    <li><strong>EPS (.eps):</strong> Professional printing standard</li>
+                    <li><strong>AI (.ai):</strong> Adobe Illustrator native format</li>
+                    <li><strong>PDF (.pdf):</strong> Portable document format supporting vectors</li>
+                </ul>
+                
+                <div class="highlight">
+                    <strong>Best Used For:</strong> Logos, icons, illustrations, typography, engravings, and any design requiring scalability and precision.
+                </div>
+            </div>
+            
+            <div class="page-number">5</div>
+        </div>
+
+        <!-- Page 6: Essential Designer Skills -->
+        <div class="page">
+            <h2>Essential Skills for Modern Designers</h2>
+            
+            <div class="two-column">
+                <div class="card">
+                    <h3>Technical Skills</h3>
+                    <img src="https://images.unsplash.com/photo-1586717791821-3f44a563fa4c?w=400&h=200&fit=crop" alt="Design software interface" class="card-image">
+                    <ul>
+                        <li><strong>Typography Mastery:</strong> Understanding font psychology, hierarchy, and readability</li>
+                        <li><strong>Color Theory:</strong> Knowing how colors interact and affect emotions</li>
+                        <li><strong>Layout Principles:</strong> Grid systems, balance, and composition</li>
+                        <li><strong>Software Proficiency:</strong> Adobe Creative Suite, Figma, Sketch</li>
+                        <li><strong>Digital Tools:</strong> Understanding of various design platforms</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3>Soft Skills</h3>
+                    <img src="https://images.unsplash.com/photo-1552664730-d307ca884978?w=400&h=200&fit=crop" alt="Team collaboration" class="card-image">
+                    <ul>
+                        <li><strong>Collaboration:</strong> Working effectively with teams and clients</li>
+                        <li><strong>Emotional Intelligence:</strong> Understanding user needs and preferences</li>
+                        <li><strong>Storytelling:</strong> Crafting narratives through visual design</li>
+                        <li><strong>Problem-Solving:</strong> Finding creative solutions to design challenges</li>
+                        <li><strong>Time Management:</strong> Meeting deadlines and managing multiple projects</li>
+                        <li><strong>Strategic Thinking:</strong> Aligning design with business objectives</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="page-number">6</div>
+        </div>
+
+        <!-- Page 7: Design Elements -->
+        <div class="page">
+            <h2>Fundamental Design Elements</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&h=300&fit=crop" alt="Design elements composition" class="card-image" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1em;">
+                
+                <h3>The Building Blocks of Design</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>1. Color</h4>
+                        <p>Establishes mood, creates hierarchy, and influences perception. Color can evoke emotions and guide user behavior.</p>
+                        
+                        <h4>2. Line</h4>
+                        <p>Creates direction, connection, and movement. Lines can be straight, curved, thick, thin, or implied.</p>
+                        
+                        <h4>3. Value</h4>
+                        <p>Refers to the lightness or darkness of colors. Creates contrast and depth in designs.</p>
+                    </div>
+                    
+                    <div>
+                        <h4>4. Shape</h4>
+                        <p>Two-dimensional outlined areas that form the foundation of design composition.</p>
+                        
+                        <h4>5. Form</h4>
+                        <p>Three-dimensional spatial configuration that adds depth and volume to designs.</p>
+                        
+                        <h4>6. Texture</h4>
+                        <p>Tactile and visual surface qualities that add interest and dimension to designs.</p>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <strong>Key Insight:</strong> These elements work together to create cohesive, effective designs. Mastering their individual properties and interactions is essential for professional design work.
+                </div>
+            </div>
+            
+            <div class="page-number">7</div>
+        </div>
+
+        <!-- Page 8: Color Theory -->
+        <div class="page">
+            <h2>Color Theory & Psychology</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?w=800&h=250&fit=crop" alt="Color wheel and theory" class="card-image">
+                
+                <h3>Research-Based Color Insights</h3>
+                <ul>
+                    <li><strong>90% of brand evaluation</strong> is based on color alone</li>
+                    <li><strong>Brightness + Low Saturation</strong> creates soft, approachable feelings</li>
+                    <li><strong>High Contrast + Saturation</strong> generates energy and excitement</li>
+                    <li><strong>Dimness + High Saturation</strong> produces intensity and drama</li>
+                    <li><strong>Gender Preferences:</strong> Pastels often appeal more to women, while bold colors attract men</li>
+                </ul>
+                
+                <h3>Color Harmony Systems</h3>
+                <div class="two-column">
+                    <div>
+                        <h4>Complementary</h4>
+                        <p>Colors opposite on the color wheel create high contrast and vibrant designs.</p>
+                        
+                        <h4>Analogous</h4>
+                        <p>Adjacent colors create harmony and are pleasing to the eye.</p>
+                    </div>
+                    <div>
+                        <h4>Triadic</h4>
+                        <p>Three evenly spaced colors provide vibrant contrast while maintaining balance.</p>
+                        
+                        <h4>Monochromatic</h4>
+                        <p>Variations of a single color create sophisticated, cohesive designs.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-number">8</div>
+        </div>
+
+        <!-- Page 9: Color Meanings -->
+        <div class="page">
+            <h2>Color Psychology & Meaning</h2>
+            
+            <div class="color-palette">
+                <div class="color-item red">
+                    <h4>Red</h4>
+                    <p>Energy, danger, courage, passion, urgency</p>
+                </div>
+                <div class="color-item orange">
+                    <h4>Orange</h4>
+                    <p>Creativity, balance, enthusiasm, warmth</p>
+                </div>
+                <div class="color-item yellow">
+                    <h4>Yellow</h4>
+                    <p>Optimism, freshness, happiness, clarity</p>
+                </div>
+                <div class="color-item green">
+                    <h4>Green</h4>
+                    <p>Nature, renewal, growth, harmony</p>
+                </div>
+                <div class="color-item blue">
+                    <h4>Blue</h4>
+                    <p>Trust, freedom, stability, professionalism</p>
+                </div>
+                <div class="color-item purple">
+                    <h4>Purple</h4>
+                    <p>Luxury, mystery, creativity, royalty</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=200&fit=crop" alt="Brand color applications" class="card-image">
+                
+                <h3>Practical Applications</h3>
+                <p>Understanding color psychology helps designers make informed decisions about brand identity, user interface design, and marketing materials. Different industries and target audiences respond differently to color choices.</p>
+                
+                <div class="highlight">
+                    <strong>Pro Tip:</strong> Always consider cultural context when choosing colors, as meanings can vary significantly across different cultures and regions.
+                </div>
+            </div>
+            
+            <div class="page-number">9</div>
+        </div>
+
+        <!-- Page 10: Gestalt Theory -->
+        <div class="page">
+            <h2>Gestalt Theory in Design</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1584464491033-06628f3a6b7b?w=800&h=300&fit=crop" alt="Visual perception and Gestalt principles" class="card-image">
+                
+                <h3>Core Principle</h3>
+                <p>The human brain subconsciously organizes visual complexity into meaningful patterns. The whole is perceived as greater than the sum of its parts.</p>
+                
+                <h3>Key Gestalt Techniques</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>1. Continuation</h4>
+                        <p>The eye naturally follows paths, lines, and curves. Designers use this to guide viewer attention through layouts.</p>
+                        
+                        <h4>2. Figure/Ground</h4>
+                        <p>The brain processes negative space and positive space relationships. Effective use creates memorable logos and designs.</p>
+                        
+                        <h4>3. Proximity</h4>
+                        <p>Elements close together are perceived as related. Used to group information and create visual hierarchy.</p>
+                    </div>
+                    
+                    <div>
+                        <h4>4. Similarity</h4>
+                        <p>Similar elements are grouped together mentally. Consistency in color, shape, or size creates unity.</p>
+                        
+                        <h4>5. Closure</h4>
+                        <p>The mind fills in missing information to complete shapes. Creates engaging, memorable designs.</p>
+                        
+                        <h4>6. Symmetry</h4>
+                        <p>Balanced compositions feel stable and harmonious to viewers.</p>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <strong>Famous Examples:</strong> NBC peacock logo utilizes figure/ground principles, while the FedEx logo cleverly uses negative space to create an arrow between the 'E' and 'x'.
+                </div>
+            </div>
+            
+            <div class="page-number">10</div>
+        </div>
+
+        <!-- Page 11: AI in Graphic Design -->
+        <div class="page">
+            <h2>AI Revolution in Graphic Design</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=300&fit=crop" alt="AI and human collaboration in design" class="card-image">
+                
+                <h3>Benefits of AI Integration</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>Accelerated Workflows</h4>
+                        <p>AI automates repetitive tasks, allowing designers to focus on creative strategy and conceptual work.</p>
+                        
+                        <h4>Consistent Branding</h4>
+                        <p>Maintains brand guidelines across multiple touchpoints and platforms automatically.</p>
+                        
+                        <h4>Rapid Iteration</h4>
+                        <p>Generate multiple design variations quickly for A/B testing and client presentations.</p>
+                    </div>
+                    
+                    <div>
+                        <h4>Cost Efficiency</h4>
+                        <p>Reduces time-to-market and resource allocation for design projects.</p>
+                        
+                        <h4>Enhanced Creativity</h4>
+                        <p>AI suggests unexpected combinations and solutions that humans might not consider.</p>
+                        
+                        <h4>Data-Driven Decisions</h4>
+                        <p>Analyzes performance metrics to optimize design effectiveness.</p>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <strong>Key Insight:</strong> AI serves as a powerful tool to augment human creativity rather than replace it. The most successful designers learn to collaborate with AI systems effectively.
+                </div>
+            </div>
+            
+            <div class="page-number">11</div>
+        </div>
+
+        <!-- Page 12: AI Applications -->
+        <div class="page">
+            <h2>Practical AI Applications</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&h=250&fit=crop" alt="AI design tools workflow" class="card-image">
+                
+                <h3>Current AI Capabilities</h3>
+                
+                <ul>
+                    <li><strong>Intelligent Background Removal:</strong> Automatically detect and remove backgrounds from complex images</li>
+                    <li><strong>Data-Driven Color Palette Selection:</strong> Analyze target audience preferences and suggest optimal color schemes</li>
+                    <li><strong>Layout Optimization:</strong> Generate multiple layout variations based on content hierarchy and user experience principles</li>
+                    <li><strong>Prompt-Based Design Generation:</strong> Create designs through natural language descriptions</li>
+                    <li><strong>Template Customization:</strong> Automatically adapt designs to different formats and platforms</li>
+                    <li><strong>Style Transfer:</strong> Apply artistic styles from one image to another</li>
+                    <li><strong>Content-Aware Scaling:</strong> Intelligently resize images while preserving important elements</li>
+                </ul>
+                
+                <div class="highlight">
+                    <h4>Emerging Trends</h4>
+                    <p>AI is evolving to understand design principles, brand guidelines, and user preferences more sophisticatedly. Future developments include real-time collaboration, emotional design analysis, and predictive design optimization.</p>
+                </div>
+            </div>
+            
+            <div class="page-number">12</div>
+        </div>
+
+        <!-- Page 13: Free AI Tools -->
+        <div class="page">
+            <h2>Essential Free AI Design Tools</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tool</th>
+                        <th>Specialization</th>
+                        <th>Best For</th>
+                        <th>URL</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Canva</strong></td>
+                        <td>Template-based design</td>
+                        <td>Social media, presentations</td>
+                        <td>canva.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pixlr</strong></td>
+                        <td>Photo editing</td>
+                        <td>Image enhancement, filters</td>
+                        <td>pixlr.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Vectr</strong></td>
+                        <td>Vector graphics</td>
+                        <td>Logo design, illustrations</td>
+                        <td>vectr.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Crello</strong></td>
+                        <td>Animated elements</td>
+                        <td>Video content, animations</td>
+                        <td>crello.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gravit Designer</strong></td>
+                        <td>Responsive design</td>
+                        <td>Multi-platform design</td>
+                        <td>designer.io</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Figma</strong></td>
+                        <td>Collaborative workflows</td>
+                        <td>UI/UX design, prototyping</td>
+                        <td>figma.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Easil</strong></td>
+                        <td>Marketing graphics</td>
+                        <td>Brand consistency</td>
+                        <td>easil.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Design Wizard</strong></td>
+                        <td>Cross-platform resizing</td>
+                        <td>Multi-format content</td>
+                        <td>designwizard.com</td>
+                    </tr>
+                    <tr>
+                        <td><strong>BeFunky</strong></td>
+                        <td>Photo collages</td>
+                        <td>Creative photo editing</td>
+                        <td>befunky.com</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="card">
+                <p><strong>Selection Tips:</strong> Choose tools based on your specific needs, learning curve preferences, and collaboration requirements. Many professionals use a combination of these tools for different aspects of their workflow.</p>
+            </div>
+            
+            <div class="page-number">13</div>
+        </div>
+
+        <!-- Page 14: Prompt Engineering -->
+        <div class="page">
+            <h2>Mastering AI Prompt Engineering</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1676299081847-824916de030a?w=800&h=300&fit=crop" alt="AI prompt engineering concept" class="card-image">
+                
+                <h3>Definition</h3>
+                <p>Prompt engineering is the art and science of crafting precise, effective instructions to guide AI systems toward desired outputs. It's the bridge between human intent and AI execution.</p>
+                
+                <h3>Key Principles</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>Clarity</h4>
+                        <p>Use clear, unambiguous language. Avoid jargon and ensure lucid instructions.</p>
+                        
+                        <h4>Specificity</h4>
+                        <p>Be precise. Include details about style, format, dimensions, and context.</p>
+                    </div>
+                    
+                    <div>
+                        <h4>Relevance</h4>
+                        <p>Ensure your prompts align with your project goals and target audience needs.</p>
+                        
+                        <h4>Context</h4>
+                        <p>Provide background information to help AI understand the bigger picture and make informed decisions.</p>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <h4>Effective Prompt Structure</h4>
+                    <p><strong>Role + Task + Context + Format + Style + Constraints</strong></p>
+                    <p>Example: "As a brand designer, create a minimalist logo for a sustainable coffee company, targeting eco-conscious millennials, in SVG format, using earth tones, maximum 2 colors."</p>
+                </div>
+            </div>
+            
+            <div class="page-number">14</div>
+        </div>
+
+        <!-- Page 15: Prompt Techniques -->
+        <div class="page">
+            <h2>Advanced Prompt Techniques</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=800&h=250&fit=crop" alt="AI learning and techniques" class="card-image">
+                
+                <h3>Three Primary Approaches</h3>
+                
+                <div class="card">
+                    <h4>1. Zero-Shot Prompting</h4>
+                    <p>Direct instructions without examples. Best for straightforward tasks utilizing AI training data.</p>
+                    <p><strong>Example:</strong> "Design a business card for a law firm with elegant typography."</p>
+                </div>
+                
+                <div class="card">
+                    <h4>2. Few-Shot Prompting</h4>
+                    <p>Provide examples to guide the AI's understanding. Effective for specific tasks.</p>
+                    <p><strong>Example:</strong> "Create a logo similar to these examples: [Example 1: Apple - simple, memorable], [Example 2: Nike - dynamic, energetic]. Design for a fitness app."</p>
+                </div>
+                
+                <div class="card">
+                    <h4>3. Chain-of-Thought Prompting</h4>
+                    <p>Break down complex tasks into step-by-step reasoning.</p>
+                    <p><strong>Example:</strong> "First, analyze the brand values. Then, consider the target audience. Next, select appropriate colors. Finally, create three logo variations."</p>
+                </div>
+                
+                <div class="highlight">
+                    <strong>Pro Tip:</strong> Combine techniques for optimal results. Start with few-shot examples, then use chain-of-thought for complex modifications.
+                </div>
+            </div>
+            
+            <div class="page-number">15</div>
+        </div>
+
+        <!-- Page 16: AI Image Tools -->
+        <div class="page">
+            <h2>Specialized AI Image Tools</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1633613286848-e6f43bbafb8d?w=800&h=250&fit=crop" alt="AI image editing tools" class="card-image">
+                
+                <h3>Task-Specific Solutions</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>Upscaling Tools</h4>
+                        <ul>
+                            <li><strong>Spyne:</strong> AI-powered image enhancement</li>
+                            <li><strong>ImgLarger:</strong> Batch processing capabilities</li>
+                            <li><strong>Real-ESRGAN:</strong> Open-source solution</li>
+                        </ul>
+                        
+                        <h4>Background Removal</h4>
+                        <ul>
+                            <li><strong>Remove.bg:</strong> Industry standard for backgrounds</li>
+                            <li><strong>Photoscissors:</strong> Precise edge detection</li>
+                            <li><strong>Clipping Magic:</strong> Manual refinement options</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4>Object Removal</h4>
+                        <ul>
+                            <li><strong>Inpaint Online:</strong> Remove unwanted objects</li>
+                            <li><strong>Cleanup.pictures:</strong> Advanced inpainting</li>
+                            <li><strong>Adobe Firefly:</strong> Content-aware fill</li>
+                        </ul>
+                        
+                        <h4>Enhancement Tools</h4>
+                        <ul>
+                            <li><strong>Fotor:</strong> Comprehensive editing suite</li>
+                            <li><strong>PhotoDirector:</strong> Professional-grade tools</li>
+                            <li><strong>Luminar AI:</strong> Intelligent photo enhancement</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <strong>Workflow Integration:</strong> Combine multiple tools in your workflow. Start with upscaling, then background removal, followed by enhancement for optimal results.
+                </div>
+            </div>
+            
+            <div class="page-number">16</div>
+        </div>
+
+        <!-- Page 17: Portfolio Development -->
+        <div class="page">
+            <h2>Building Your Design Portfolio</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?w=800&h=250&fit=crop" alt="Design portfolio presentation" class="card-image">
+                
+                <h3>Essential Portfolio Platforms</h3>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Platform</th>
+                            <th>Best For</th>
+                            <th>Key Features</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Behance</strong></td>
+                            <td>Creative professionals</td>
+                            <td>Adobe integration, industry recognition</td>
+                        </tr>
+                        <tr>
+                            <td><strong>WordPress</strong></td>
+                            <td>Custom designs</td>
+                            <td>Full control, SEO optimization</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Wix</strong></td>
+                            <td>Beginners</td>
+                            <td>Drag-and-drop, templates</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Google Sites</strong></td>
+                            <td>Simple portfolios</td>
+                            <td>Free, easy sharing</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tailor Brands</strong></td>
+                            <td>Brand designers</td>
+                            <td>Brand-focused showcase</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Canva</strong></td>
+                            <td>Quick setup</td>
+                            <td>Templates, integrated design tools</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="highlight">
+                    <h4>Portfolio Best Practices</h4>
+                    <ul>
+                        <li><strong>Quality over Quantity:</strong> Showcase 10-15 of your best pieces</li>
+                        <li><strong>Tell the Story:</strong> Explain your design process and decisions</li>
+                        <li><strong>Use Mockups:</strong> Present work in realistic contexts</li>
+                        <li><strong>Keep it Updated:</strong> Regularly refresh with new projects</li>
+                        <li><strong>Mobile Optimization:</strong> Ensure your portfolio works on all devices</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="page-number">17</div>
+        </div>
+
+        <!-- Page 18: Commercialization -->
+        <div class="page">
+            <h2>Monetizing Your Design Skills</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=250&fit=crop" alt="Freelance design business" class="card-image">
+                
+                <h3>Freelance Platforms</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>Contest-Based Platforms</h4>
+                        <ul>
+                            <li><strong>99Designs:</strong> Design contests and 1-to-1 projects</li>
+                            <li><strong>DesignCrowd:</strong> Global design competitions</li>
+                            <li><strong>Hatchwise:</strong> Logo and branding contests</li>
+                        </ul>
+                        
+                        <h4>Service Marketplaces</h4>
+                        <ul>
+                            <li><strong>Fiverr:</strong> Quick turnaround services</li>
+                            <li><strong>Upwork:</strong> Long-term client relationships</li>
+                            <li><strong>Freelancer:</strong> Diverse project types</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4>Professional Networks</h4>
+                        <ul>
+                            <li><strong>Behance Jobs:</strong> Creative industry focus</li>
+                            <li><strong>LinkedIn:</strong> Professional networking</li>
+                            <li><strong>Dribbble:</strong> Design community jobs</li>
+                        </ul>
+                        
+                        <h4>Specialized Platforms</h4>
+                        <ul>
+                            <li><strong>Toptal:</strong> Elite freelancer network</li>
+                            <li><strong>Working Not Working:</strong> Creative talent showcase</li>
+                            <li><strong>The Dots:</strong> Creative industry connections</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <h4>Direct Client Acquisition</h4>
+                    <p><strong>Higher Pay Potential:</strong> Direct clients typically offer better rates than platform-mediated work.</p>
+                    <p><strong>Relationship Building:</strong> Long-term partnerships lead to consistent work and referrals.</p>
+                    <p><strong>Strategies:</strong> Networking events, cold outreach, content marketing, and referral programs.</p>
+                </div>
+            </div>
+            
+            <div class="page-number">18</div>
+        </div>
+
+        <!-- Page 19: Legal & Ethical Considerations -->
+        <div class="page">
+            <h2>Legal & Ethical Design Practices</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=250&fit=crop" alt="Ethics and legal considerations" class="card-image">
+                
+                <h3>Critical Considerations</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>Copyright Compliance</h4>
+                        <ul>
+                            <li>Understand fair use principles</li>
+                            <li>Use licensed images and fonts</li>
+                            <li>Respect trademark protections</li>
+                            <li>Document usage rights</li>
+                        </ul>
+                        
+                        <h4>Cultural Sensitivity</h4>
+                        <ul>
+                            <li>Avoid cultural appropriation</li>
+                            <li>Research cultural symbols</li>
+                            <li>Consider global perspectives</li>
+                            <li>Consult cultural experts when needed</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h4>Data Security</h4>
+                        <ul>
+                            <li>Protect client information</li>
+                            <li>Secure file sharing methods</li>
+                            <li>GDPR compliance awareness</li>
+                            <li>Backup and recovery plans</li>
+                        </ul>
+                        
+                        <h4>Social Responsibility</h4>
+                        <ul>
+                            <li>Promote positive messages</li>
+                            <li>Avoid misleading content</li>
+                            <li>Consider environmental impact</li>
+                            <li>Support diversity and inclusion</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <h4>AI Ethics in Design</h4>
+                    <p><strong>Training Data Bias:</strong> Be aware that AI tools may reflect biases present in their training data.</p>
+                    <p><strong>Attribution:</strong> Understand when and how to credit AI assistance in your work.</p>
+                    <p><strong>Authenticity:</strong> Maintain transparency about AI involvement in your creative process.</p>
+                </div>
+            </div>
+            
+            <div class="page-number">19</div>
+        </div>
+
+        <!-- Page 20: 2024 Design Trends -->
+        <div class="page">
+            <h2>Current Design Trends</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&h=250&fit=crop" alt="Modern design trends" class="card-image">
+                
+                <h3>Leading Trends in 2024</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>1. Animated Illustrations</h4>
+                        <p>Micro-interactions and subtle animations enhance user engagement and create memorable experiences.</p>
+                        
+                        <h4>2. Inclusive Visual Language</h4>
+                        <p>Designs that represent diverse communities and ensure accessibility for all users.</p>
+                        
+                        <h4>3. Immersive 3D Experiences</h4>
+                        <p>Three-dimensional elements create depth and interactivity in digital designs.</p>
+                    </div>
+                    
+                    <div>
+                        <h4>4. Retro Revival</h4>
+                        <p>Neon colors, pixel art, and vintage aesthetics appeal to nostalgia while feeling fresh.</p>
+                        
+                        <h4>5. Bold Experimental Typography</h4>
+                        <p>Custom fonts and unconventional text treatments make strong brand statements.</p>
+                        
+                        <h4>6. Sustainable Design Aesthetics</h4>
+                        <p>Earth tones, organic shapes, and eco-friendly messaging reflect environmental consciousness.</p>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <h4>Emerging Technologies</h4>
+                    <ul>
+                        <li><strong>Augmented Reality (AR):</strong> Overlaying digital designs onto real-world environments</li>
+                        <li><strong>Voice Interface Design:</strong> Creating visual systems for voice-activated devices</li>
+                        <li><strong>AI-Generated Content:</strong> Collaborating with AI for unique design solutions</li>
+                        <li><strong>Sustainable Materials:</strong> Eco-friendly printing and packaging design</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="page-number">20</div>
+        </div>
+
+        <!-- Page 21: Future of Design -->
+        <div class="page">
+            <h2>The Future of Graphic Design</h2>
+            
+            <div class="card">
+                <img src="https://images.unsplash.com/photo-1581291518857-4e27b48ff24e?w=800&h=250&fit=crop" alt="Future of design technology" class="card-image">
+                
+                <h3>Emerging Paradigms</h3>
+                
+                <div class="two-column">
+                    <div>
+                        <h4>AI-Human Collaboration</h4>
+                        <p>The future involves seamless partnership between human creativity and AI efficiency, where designers focus on strategy and AI handles execution.</p>
+                        
+                        <h4>Personalized Design</h4>
+                        <p>AI will enable mass customization, creating unique designs for individual users based on preferences and behavior data.</p>
+                        
+                        <h4>Real-Time Adaptation</h4>
+                        <p>Designs that automatically adjust based on context, device, user preferences, and environmental factors.</p>
+                    </div>
+                    
+                    <div>
+                        <h4>Sustainable Innovation</h4>
+                        <p>Growing emphasis on eco-friendly design practices, from digital carbon footprints to sustainable printing methods.</p>
+                        
+                        <h4>Accessibility First</h4>
+                        <p>Universal design principles becoming standard, ensuring all designs are inclusive by default.</p>
+                        
+                        <h4>Cross-Reality Design</h4>
+                        <p>Designing for virtual, augmented, and mixed reality environments will become mainstream.</p>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <h4>Skills for Tomorrow</h4>
+                    <ul>
+                        <li><strong>AI Literacy:</strong> Understanding how to work with and direct AI tools</li>
+                        <li><strong>Data Visualization:</strong> Making complex information accessible and engaging</li>
+                        <li><strong>Motion Design:</strong> Creating dynamic, animated experiences</li>
+                        <li><strong>UX Strategy:</strong> Connecting design decisions to business outcomes</li>
+                        <li><strong>Cultural Intelligence:</strong> Designing for global, diverse audiences</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="page-number">21</div>
+        </div>
+
+        <!-- Page 22: Conclusion -->
+        <div class="page">
+            <h2>Key Takeaways & Next Steps</h2>
+            
+            <div class="card">
+                
+                <h3>Essential Insights</h3>
+                
+                <div class="highlight">
+                    <h4>1. AI Enhances, Doesn't Replace</h4>
+                    <p>Artificial intelligence serves as a powerful tool to augment human creativity, not replace it. The most successful designers will be those who learn to collaborate effectively with AI systems while maintaining their unique creative vision.</p>
+                </div>
+                
+                <div class="highlight">
+                    <h4>2. Balanced Skill Development</h4>
+                    <p>Mastery in graphic design requires both technical proficiency and soft skills. Technical skills get you in the door, but communication, empathy, and strategic thinking drive long-term success.</p>
+                </div>
+                
+                <div class="highlight">
+                    <h4>3. Ethics Remain Paramount</h4>
+                    <p>As AI adoption accelerates, maintaining ethical standards becomes more critical. Designers must consider copyright, cultural sensitivity, and social responsibility in their AI-assisted work.</p>
+                </div>
+                
+                <h3>Your Action Plan</h3>
+                <ol>
+                    <li><strong>Experiment with AI tools</strong> from the recommended list</li>
+                    <li><strong>Build a diverse portfolio</strong> showcasing both traditional and AI-assisted work</li>
+                    <li><strong>Stay current</strong> with design trends and emerging technologies</li>
+                    <li><strong>Network actively</strong> in design communities and professional platforms</li>
+                    <li><strong>Develop your unique style</strong> while embracing new tools and techniques</li>
+                </ol>
+                
+                <div class="card" style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <h3>Ready to Transform Your Design Career?</h3>
+                    <p>The future of graphic design is here. Embrace the tools, master the principles, and create designs that make a lasting impact.</p>
+                </div>
+            </div>
+            
+            <div class="page-number">22</div>
+        </div>
+    </div>
+    
+    <button class="print-button" onclick="window.print()">Export to PDF</button>
+
+<script>
+// Enhanced print functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const printButton = document.querySelector('.print-button');
+    
+    printButton.addEventListener('click', function() {
+        // Force background styles before printing
+        document.querySelectorAll('*').forEach(el => {
+            const styles = window.getComputedStyle(el);
+            if (styles.backgroundImage && styles.backgroundImage !== 'none') {
+                el.style.setProperty('background-image', styles.backgroundImage, 'important');
+            }
+            if (styles.backgroundColor && styles.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                el.style.setProperty('background-color', styles.backgroundColor, 'important');
+            }
+        });
+        
+        // Add print-specific class
+        document.body.classList.add('printing');
+        
+        // Delay print to allow styles to apply
+        setTimeout(() => {
+            window.print();
+            document.body.classList.remove('printing');
+        }, 500);
+    });
+    
+    // Mobile gradient preservation
+    if (window.matchMedia('(max-width: 768px)').matches) {
+        document.querySelectorAll('.title-page, .highlight, .card[style*="gradient"]').forEach(el => {
+            el.style.backgroundAttachment = 'fixed';
+        });
+    }
+});
+</script>
+    
+    <script>
+        // Additional print optimization
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prevent widows and orphans in print
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @media print {
+                    h1, h2, h3, h4, h5, h6 {
+                        page-break-after: avoid;
+                    }
+                    p, li {
+                        page-break-inside: avoid;
+                    }
+                    .page {
+                        overflow: visible !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Adjust image sizes for print
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                img.style.maxWidth = '100%';
+                img.style.height = 'auto';
+            });
+        });
+    </script>
+</body>
+</html>
