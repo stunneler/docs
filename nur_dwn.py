@@ -1,4 +1,3 @@
-➜  2 cat nur_pdf_down.py
 #!/usr/bin/env python3
 """
 Nursing Certification PDF Downloader
@@ -141,13 +140,13 @@ class NursingPDFDownloader:
             if content_length:
                 size_bytes = int(content_length)
                 size_mb = size_bytes / (1024 * 1024)
-                logger.info(f"File size: {size_mb:.2f} MB")
+                self.logger.info(f"File size: {size_mb:.2f} MB")
                 return size_bytes <= self.max_file_size_bytes, size_mb
             else:
                 # If no content-length header, we'll check during download
                 return True, 0
         except Exception as e:
-            logger.warning(f"Could not check file size for {url}: {e}")
+            self.logger.warning(f"Could not check file size for {url}: {e}")
             return True, 0
     
     def search_duckduckgo(self, query, max_results=20):
@@ -220,9 +219,215 @@ class NursingPDFDownloader:
             self.logger.error(f"Google Scholar search failed: {e}")
             return []
     
+    def search_google_direct_pdfs(self, query, max_results=15):
+        """Search Google directly for PDF files - most effective method"""
+        self.update_progress("Searching Google for direct PDFs...")
+        self.logger.info(f"Starting Google direct PDF search for: {query}")
+        
+        # Multiple search variations for better results
+        search_variations = [
+            f"{query} filetype:pdf",
+            f"{query} nursing filetype:pdf",
+            f"{query} medical filetype:pdf",
+            f"{query} textbook filetype:pdf",
+            f"{query} guide filetype:pdf",
+            f"{query} manual filetype:pdf site:edu"
+        ]
+        
+        all_links = []
+        
+        for i, search_query in enumerate(search_variations, 1):
+            try:
+                self.update_progress(f"Google PDF search {i}/{len(search_variations)}")
+                
+                # Search multiple pages for this variation
+                variation_links = self.search_google_pages(search_query, pages=2)
+                all_links.extend(variation_links)
+                self.logger.info(f"Google variation {i} found {len(variation_links)} PDF links")
+                
+                if len(all_links) >= max_results:
+                    break
+                
+                # Respectful delay between search variations
+                time.sleep(random.uniform(3, 5))
+                
+            except Exception as e:
+                self.logger.error(f"Google PDF search variation {i} failed: {e}")
+                continue
+        
+        unique_links = list(set(all_links))[:max_results]
+        self.logger.info(f"Google direct PDF search found {len(unique_links)} unique links")
+        return unique_links
+    
+    def search_google_pages(self, search_query, pages=2):
+        """Search multiple pages of Google results"""
+        all_links = []
+        
+        for page in range(pages):
+            try:
+                # Google pagination: start parameter (0, 10, 20, etc.)
+                start = page * 10
+                search_url = f"https://www.google.com/search?q={urllib.parse.quote(search_query)}&start={start}"
+                self.logger.info(f"Google search page {page + 1}: {search_url}")
+                
+                response = self.session.get(search_url, timeout=15)
+                
+                if response.status_code == 200:
+                    soup = BeautifulSoup(response.text, 'html.parser')
+                    page_links = self.extract_google_pdf_links(soup)
+                    all_links.extend(page_links)
+                    self.logger.info(f"Google page {page + 1} found {len(page_links)} PDF links")
+                    
+                    # If no results on this page, stop searching further pages
+                    if not page_links and page > 0:
+                        self.logger.info(f"No results on page {page + 1}, stopping pagination")
+                        break
+                        
+                else:
+                    self.logger.warning(f"Google search page {page + 1} failed with status: {response.status_code}")
+                    break
+                
+                # Delay between pages
+                if page < pages - 1:
+                    time.sleep(random.uniform(2, 3))
+                
+            except Exception as e:
+                self.logger.error(f"Google search page {page + 1} failed: {e}")
+                break
+        
+        return all_links
+    
+    def extract_google_pdf_links(self, soup):
+        """Extract PDF links from Google search results and follow promising links"""
+        pdf_links = []
+        potential_pages = []
+        
+        # Look for direct PDF links in Google search results
+        for link in soup.find_all('a', href=True):
+            href = link['href']
+            
+            # Handle Google's URL redirection format
+            if href.startswith('/url?q='):
+                try:
+                    actual_url = href.split('/url?q=')[1].split('&')[0]
+                    actual_url = urllib.parse.unquote(actual_url)
+                    
+                    # Direct PDF links
+                    if actual_url.lower().endswith('.pdf'):
+                        pdf_links.append(actual_url)
+                        self.logger.info(f"Found direct PDF link: {actual_url}")
+                    
+                    # Potential pages that might contain PDFs
+                    elif any(indicator in actual_url.lower() for indicator in [
+                        'repository', 'library', 'docs', 'publications', 'resources',
+                        'nursing', 'medical', 'health', 'education', '.edu', '.ac.',
+                        'poltekkes', 'university', 'college'
+                    ]):
+                        potential_pages.append(actual_url)
+                        
+                except Exception as e:
+                    continue
+            
+            # Direct HTTP links
+            elif href.startswith('http'):
+                if href.lower().endswith('.pdf'):
+                    pdf_links.append(href)
+                    self.logger.info(f"Found direct PDF link: {href}")
+        
+        # Look for PDF indicators in search result snippets
+        for result_div in soup.find_all('div', class_=['g', 'tF2Cxc']):  # Google result containers
+            # Check if result mentions PDF
+            text_content = result_div.get_text().lower()
+            if 'pdf' in text_content and any(word in text_content for word in [
+                'pages', 'download', 'file', 'document', 'nursing', 'pediatric'
+            ]):
+                # Find the main link for this result
+                main_link = result_div.find('a', href=True)
+                if main_link:
+                    href = main_link['href']
+                    if href.startswith('/url?q='):
+                        try:
+                            actual_url = href.split('/url?q=')[1].split('&')[0]
+                            actual_url = urllib.parse.unquote(actual_url)
+                            if actual_url not in potential_pages and not actual_url.endswith('.pdf'):
+                                potential_pages.append(actual_url)
+                        except:
+                            continue
+        
+        # Follow promising pages to look for PDFs (limit to avoid too many requests)
+        self.logger.info(f"Found {len(potential_pages)} potential PDF pages to check")
+        for i, page_url in enumerate(potential_pages[:5]):  # Limit to 5 pages per search
+            try:
+                self.update_progress(f"Checking page {i+1}/5 for PDFs...")
+                page_pdfs = self.extract_pdfs_from_page(page_url)
+                pdf_links.extend(page_pdfs)
+                if page_pdfs:
+                    self.logger.info(f"Found {len(page_pdfs)} PDFs on page: {page_url}")
+                
+                # Small delay between page checks
+                time.sleep(1)
+                
+            except Exception as e:
+                self.logger.warning(f"Failed to check page {page_url}: {e}")
+                continue
+        
+        return list(set(pdf_links))  # Remove duplicates
+    
+    def extract_pdfs_from_page(self, page_url):
+        """Extract PDF links from a specific page"""
+        pdf_links = []
+        
+        try:
+            response = self.session.get(page_url, timeout=10)
+            if response.status_code != 200:
+                return pdf_links
+            
+            soup = BeautifulSoup(response.text, 'html.parser')
+            
+            # Look for direct PDF links
+            for link in soup.find_all('a', href=True):
+                href = link['href']
+                
+                # Convert relative URLs to absolute
+                if href.startswith('/'):
+                    href = urljoin(page_url, href)
+                elif not href.startswith('http'):
+                    continue
+                
+                # Check if it's a PDF
+                if href.lower().endswith('.pdf') or '.pdf' in href.lower():
+                    pdf_links.append(href)
+            
+            # Look for download buttons or PDF indicators
+            for element in soup.find_all(['a', 'button'], href=True):
+                text = element.get_text().lower()
+                href = element.get('href', '')
+                
+                if any(word in text for word in ['download', 'pdf', 'view pdf', 'full text']):
+                    if href.startswith('/'):
+                        href = urljoin(page_url, href)
+                    
+                    if href.startswith('http') and ('.pdf' in href.lower() or 'pdf' in text):
+                        pdf_links.append(href)
+            
+            # Look for meta tags or specific patterns
+            for meta in soup.find_all('meta'):
+                content = meta.get('content', '')
+                if '.pdf' in content.lower():
+                    if content.startswith('http'):
+                        pdf_links.append(content)
+                    elif content.startswith('/'):
+                        pdf_links.append(urljoin(page_url, content))
+                        
+        except Exception as e:
+            self.logger.error(f"Error extracting PDFs from {page_url}: {e}")
+        
+        return list(set(pdf_links))
+    
     def search_educational_sites(self, query, max_results=10):
         """Search known educational and medical sites directly"""
         self.update_progress("Searching educational sites...")
+        self.logger.info(f"Starting educational sites search for: {query}")
         
         # Known sites that often have nursing/medical PDFs
         educational_sites = [
@@ -241,17 +446,21 @@ class NursingPDFDownloader:
                 # Search within the site
                 search_query = f"site:{site} {query} filetype:pdf"
                 search_url = f"https://www.google.com/search?q={urllib.parse.quote(search_query)}"
+                self.logger.info(f"Educational site search URL: {search_url}")
                 
                 response = self.session.get(search_url, timeout=10)
                 
                 if response.status_code == 200:
                     soup = BeautifulSoup(response.text, 'html.parser')
+                    site_links = self.extract_google_pdf_links(soup)
                     
-                    # Look for PDF links in Google search results
-                    for link in soup.find_all('a', href=True):
-                        href = link['href']
-                        if '.pdf' in href and any(domain in href for domain in educational_sites):
-                            all_links.append(href)
+                    # Filter to only include links from the target site
+                    filtered_links = [link for link in site_links if any(domain in link for domain in [site])]
+                    all_links.extend(filtered_links)
+                    
+                    self.logger.info(f"Educational site {site} found {len(filtered_links)} links")
+                else:
+                    self.logger.warning(f"Educational site search failed with status: {response.status_code}")
                 
                 time.sleep(2)  # Be respectful to Google
                 
@@ -259,13 +468,16 @@ class NursingPDFDownloader:
                     break
                     
             except Exception as e:
+                self.logger.error(f"Educational site search failed for {site}: {e}")
                 continue
         
-        return list(set(all_links))[:max_results]
+        unique_links = list(set(all_links))[:max_results]
+        self.logger.info(f"Educational sites total unique links found: {len(unique_links)}")
+        return unique_links
     
     def selenium_search(self, search_url, max_results=20):
         """Use Selenium when bot detection is encountered"""
-        logger.info("Using Selenium for bot-protected search")
+        self.logger.info("Using Selenium for bot-protected search")
         
         try:
             driver = webdriver.Chrome(options=self.chrome_options)
@@ -278,17 +490,17 @@ class NursingPDFDownloader:
             )
             
             if self.is_bot_challenge(driver.page_source):
-                logger.warning("CAPTCHA detected - manual intervention may be needed")
+                self.logger.warning("CAPTCHA detected - manual intervention may be needed")
                 return []
             
             soup = BeautifulSoup(driver.page_source, 'html.parser')
-            pdf_links = self.extract_pdf_links(soup)
+            pdf_links = self.extract_pdf_links(soup, search_url)
             
             driver.quit()
             return pdf_links[:max_results]
             
         except Exception as e:
-            logger.error(f"Selenium search error: {e}")
+            self.logger.error(f"Selenium search error: {e}")
             return []
     
     def extract_pdf_links(self, soup, base_url=""):
@@ -404,30 +616,42 @@ class NursingPDFDownloader:
         """Search and download PDFs for a specific query"""
         self.current_query = query
         
-        # Try multiple search strategies
+        # Try multiple search strategies in order of effectiveness
         all_links = []
         
-        # Try educational sites first (most reliable)
-        educational_links = self.search_educational_sites(query, max_downloads // 3)
-        all_links.extend(educational_links)
+        # 1. Google direct PDF search (most effective - gets actual PDF links)
+        google_links = self.search_google_direct_pdfs(query, max_downloads // 2)
+        all_links.extend(google_links)
+        self.logger.info(f"Google direct search found {len(google_links)} links")
         
-        # Try DuckDuckGo
+        # 2. Educational sites (reliable sources)
         if len(all_links) < max_downloads:
             remaining = max_downloads - len(all_links)
-            duckduckgo_links = self.search_duckduckgo(query, remaining)
-            all_links.extend(duckduckgo_links)
+            educational_links = self.search_educational_sites(query, remaining // 2)
+            all_links.extend(educational_links)
+            self.logger.info(f"Educational sites found {len(educational_links)} links")
         
-        # Try Google Scholar if we need more results
+        # 3. DuckDuckGo (backup method)
+        if len(all_links) < max_downloads:
+            remaining = max_downloads - len(all_links)
+            duckduckgo_links = self.search_duckduckgo(query, remaining // 2)
+            all_links.extend(duckduckgo_links)
+            self.logger.info(f"DuckDuckGo found {len(duckduckgo_links)} links")
+        
+        # 4. Google Scholar (academic sources)
         if len(all_links) < max_downloads:
             remaining = max_downloads - len(all_links)
             scholar_links = self.search_google_scholar(query, remaining)
             all_links.extend(scholar_links)
+            self.logger.info(f"Google Scholar found {len(scholar_links)} links")
         
         # Remove duplicates and limit results
         unique_links = list(set(all_links))[:max_downloads]
+        self.logger.info(f"Total unique links for '{query}': {len(unique_links)}")
         
         if not unique_links:
             self.update_progress("No PDFs found")
+            self.logger.warning(f"No PDF links found for query: {query}")
             time.sleep(2)
             return 0
         
@@ -452,6 +676,7 @@ class NursingPDFDownloader:
                 time.sleep(random.uniform(0.5, 1.5))
         
         self.current_file = ""
+        self.logger.info(f"Query '{query}' completed: {successful_downloads}/{len(unique_links)} downloads successful")
         return successful_downloads
     
     def generate_filename(self, query, url, index):
@@ -704,5 +929,4 @@ def main():
     print(f"Detailed logs available at: {downloader.log_file}")
 
 if __name__ == "__main__":
-    main()%                                                                                                                        
-➜  2 
+    main() 
